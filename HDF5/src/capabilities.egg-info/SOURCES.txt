@@ -1,0 +1,17 @@
+setup.py
+src/__init__.py
+src/mcp_handlers.py
+src/server.py
+src/capabilities/__init__.py
+src/capabilities/compression.py
+src/capabilities/hdf5_handler.py
+src/capabilities/pandas_handler.py
+src/capabilities/parallel_sort.py
+src/capabilities/parquet_handler.py
+src/capabilities/visualization.py
+src/capabilities.egg-info/PKG-INFO
+src/capabilities.egg-info/SOURCES.txt
+src/capabilities.egg-info/dependency_links.txt
+src/capabilities.egg-info/top_level.txt
+tests/test_capabilities.py
+tests/test_mcp_handlers.py
