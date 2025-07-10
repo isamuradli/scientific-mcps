@@ -3,6 +3,7 @@ Parallel processing capability for handling large log files.
 Implements true parallel processing using multiprocessing and chunked processing.
 """
 import os
+import re
 import asyncio
 import aiofiles
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
