@@ -1,119 +1,198 @@
 
-# Scientific MCP Server
+# ArXiv MCP Server
 
-##  Implemented MCP Capabilities
+A comprehensive Model Context Protocol (MCP) server for accessing and analyzing research papers from ArXiv. Provides advanced search capabilities, paper analysis, and citation management tools.
 
-The following capabilities have been implemented:
+## Implemented MCP Capabilities
 
-| Capability    | Type     | Description                                                              |
-|---------------|----------|--------------------------------------------------------------------------|
+| Capability | Type | Description |
+|------------|------|-------------|
+| `search_arxiv` | Tool | Search papers by category (e.g., 'cs.AI', 'physics.astro-ph') |
+| `get_recent_papers` | Tool | Get recent papers from a specific ArXiv category |
+| `search_papers_by_author` | Tool | Search papers by author name |
+| `search_by_title` | Tool | Search papers by title keywords |
+| `search_by_abstract` | Tool | Search papers by abstract keywords |
+| `search_by_subject` | Tool | Search papers by subject classification |
+| `search_date_range` | Tool | Search papers within a specific date range |
+| `get_paper_details` | Tool | Get detailed information about a specific paper |
+| `export_to_bibtex` | Tool | Export search results to BibTeX format |
+| `find_similar_papers` | Tool | Find papers similar to a reference paper |
+| `download_paper_pdf` | Tool | Download the PDF of a paper from ArXiv |
+| `get_pdf_url` | Tool | Get the direct PDF URL for a paper |
+| `download_multiple_pdfs` | Tool | Download multiple PDFs concurrently |
 
-| `arxiv`       | Data     | Fetches 3 recent research papers via the Arxiv API using `httpx`.        |
+## Quick Start
 
+### Installation
 
-## Setup Instructions (Using `uv`)
-
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/iowarp/scientific-mcps.git
-   cd arxiv
+   cd scientific-mcps/Arxiv
    ```
 
-2. Create a virtual environment with `uv`:
-   ```bash
-   uv venv
-   ```
-
-3. Install dependencies:
+2. **Install dependencies:**
    ```bash
    uv sync
    ```
 
-4. (Optional) Generate a lockfile:
+3. **Test the installation:**
    ```bash
-   uv lock
+   uv run python demo.py
    ```
-   
 
-## How to Run the MCP Server
-1. **Activate your virtual environment**:
+### Running the Server
 
 ```bash
-.venv\Scripts\activate     #On Windows
-source .venv/bin/activate  #On macOS/Linux
-```
-2. **Start the server using uvicorn**:
-```
-uvicorn src.server:app --reload
-```
-The MCP server will start on:
-```
-http://localhost:8000/mcp
+# Using the script
+uv run arxiv-mcp
+
+# Direct execution
+uv run python src/arxiv_mcp/server.py
 ```
 
-You can send JSON-RPC POST requests to this endpoint using Postman, curl, or test clients.
+## Usage Examples
 
+### Search by Category
+```python
+# Search for recent AI papers
+search_arxiv("cs.AI", max_results=5)
+```
 
-## How to Run the Tests
+### Search by Title
+```python
+# Find papers about machine learning
+search_by_title("machine learning", max_results=10)
+```
 
-1. **Activate the virtual environment**(created using `uv venv`):
+### Get Paper Details
+```python
+# Get details for a specific paper
+get_paper_details("1706.03762")  # Attention Is All You Need
+```
+
+### Export to BibTeX
+```python
+# Export search results for citation
+export_to_bibtex(papers_list)
+```
+
+### Download Paper PDFs
+```python
+# Download a single paper PDF
+download_paper_pdf("1706.03762")  # Attention Is All You Need
+
+# Get PDF URL without downloading
+get_pdf_url("1706.03762")
+
+# Download multiple PDFs concurrently
+download_multiple_pdfs('["1706.03762", "2301.12345"]', download_path="/path/to/save")
+```
+
+## Common ArXiv Categories
+
+- `cs.AI` - Artificial Intelligence
+- `cs.LG` - Machine Learning
+- `cs.CV` - Computer Vision and Pattern Recognition
+- `cs.CL` - Computation and Language
+- `cs.CR` - Cryptography and Security
+- `physics.astro-ph` - Astrophysics
+- `math.CO` - Combinatorics
+- `q-bio.QM` - Quantitative Methods
+
+## Testing
+
+Run the comprehensive test suite:
 
 ```bash
-.venv\Scripts\activate     #On Windows
-source .venv/bin/activate  #On macOS/Linux
+# Run all tests
+uv run pytest
+
+# Run specific test files
+uv run pytest tests/test_category_search.py
+uv run pytest tests/test_integration.py
+
+# Run with verbose output
+uv run pytest -v
 ```
 
-2. **Run all tests using `pytest`**:
+## Configuration
 
-```bash
-pytest
+The server supports environment variables:
+
+- `MCP_TRANSPORT`: Transport type (`stdio` or `sse`)
+- `MCP_SSE_HOST`: Host for SSE transport (default: `0.0.0.0`)
+- `MCP_SSE_PORT`: Port for SSE transport (default: `8000`)
+
+## Integration with MCP Clients
+
+### Claude Desktop
+Add to your configuration:
+```json
+{
+  "arxiv-mcp": {
+    "command": "uv",
+    "args": [
+      "--directory", "/path/to/scientific-mcps/Arxiv",
+      "run", "arxiv-mcp"
+    ]
+  }
+}
 ```
 
-# MCP Capabilities
+### Other MCP Clients
+The server uses stdio transport by default and is compatible with any MCP client.
 
-| Method              | Description                                 |
-|---------------------|---------------------------------------------|
-| `mcp/listTools`     | Lists tool-oriented capabilities only       |
-| `mcp/listDataSources` | Lists data-oriented capabilities only    |
-
-These are accessible via the same `/mcp` endpoint using the standard JSON-RPC 2.0 structure.
-
-- Implemented MCP capabilities  
-    - `arxiv` (data)
-
-- Implemented robust error handling using JSON-RPC 2.0 error format  
-  -  Standardized error codes:
-    - `-32601` : method/tool not found
-    - `-32602` : invalid or missing parameters
-    - `-32000/-32001` : general internal errors
-
-- Asynchronous logic in all capability handlers  
-  - All capability functions are defined using `async def`
-  - `arxiv` uses `httpx.AsyncClient()` for real API calls
-
-##  Assumptions and Notes
-
-- Arxiv responses are summarized and do not include full XML parsing.
-- All handlers are asynchronous and return MCP-compliant JSON responses.
-- Proper error responses are implemented for missing parameters or tool names.
-- JSON-RPC error codes include: `-32601` (method not found), `-32602` (invalid params), and `-32000` (internal errors).
-
----
-
-## Repository Structure
+## Project Structure
 
 ```
-scientific-mcp-server/
-├── pyproject.toml
+Arxiv/
 ├── README.md
+├── pyproject.toml
+├── demo.py
+├── docs/
+│   └── basic_install.md
+├── assets/
+├── data/
 ├── src/
-│   ├── server.py
-│   ├── mcp_handlers.py
-│   └── capabilities/
-│       ├── arxiv_handler.py
-│    
-├── tests/
-│   ├── test_mcp_handlers.py
-│   └── test_capabilities.py
-└── .gitignore
+│   └── arxiv_mcp/
+│       ├── __init__.py
+│       ├── server.py
+│       ├── mcp_handlers.py
+│       └── capabilities/
+│           ├── __init__.py
+│           ├── arxiv_base.py
+│           ├── category_search.py
+│           ├── text_search.py
+│           ├── date_search.py
+│           ├── paper_details.py
+│           └── export_utils.py
+└── tests/
+    ├── __init__.py
+    ├── test_capabilities.py
+    ├── test_mcp_handlers.py
+    ├── test_category_search.py
+    ├── test_text_search.py
+    ├── test_paper_details.py
+    ├── test_export_utils.py
+    └── test_integration.py
 ```
+
+## Features
+
+- **Advanced Search**: Multiple search methods including category, title, abstract, author, and date range
+- **Paper Analysis**: Detailed paper information and similarity detection
+- **Citation Management**: BibTeX export for research bibliography
+- **Comprehensive Testing**: Full test coverage with integration tests
+- **Error Handling**: Robust error handling with informative messages
+- **Async Support**: Fully asynchronous for optimal performance
+
+## Documentation
+
+- [Installation Guide](docs/basic_install.md)
+- [API Documentation](src/arxiv_mcp/capabilities/)
+- [Test Examples](tests/)
+
+## License
+
+MIT License - see the main repository for details.
