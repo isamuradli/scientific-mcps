@@ -42,7 +42,7 @@ uv run python demo.py
 uv run arxiv-mcp
 
 # Direct execution
-uv run python src/arxiv_mcp/server.py
+uv run python src/server.py
 ```
 
 ### Configuration
